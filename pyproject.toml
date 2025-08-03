@@ -1,0 +1,19 @@
+[project]
+name = "kvarnen-electricity"
+version = "2025.8.1"
+description = "Process invoices for electricity"
+readme = "README.md"
+authors = [
+    { name = "Daniel Engval", email = "daniel@engvalls.eu" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "playwright>=1.54.0",
+]
+
+[project.scripts]
+kvarnen-electricity = "kvarnen_electricity:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
