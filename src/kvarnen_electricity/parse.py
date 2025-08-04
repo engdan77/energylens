@@ -1,4 +1,6 @@
 from pathlib import Path
+
+import bs4
 import pandas as pd
 import polars as pl
 import itertools
@@ -66,9 +68,18 @@ def get_data_dict_from_tables(tables: TableTypeDict) -> dict:
     return d
 
 
+def get_date_and_invoice_number(html_path: Path) -> tuple[str, str]:
+    """Extract date and invoice number from HTML file name."""
+    html = bs4.BeautifulSoup(open(html_path.as_posix()))
+    date = next((e.text.split().pop(0) for e in html.find_all('h2') if e.text.endswith('FAKTURA')))
+    invoice_number = next((list(html.find_all('p'))[idx + 1].text for idx, p in enumerate(list(html.find_all('p'))) if p.text.startswith('Faktura')), None)
+    return date, invoice_number
+
+
 def parse_html_to_pl(html_path: Path) -> pl.DataFrame:
     """Parse HTML file to Polars DataFrame."""
     input_tables = pd.read_html(html_path.as_posix(), decimal=',', thousands='.', header=0)
     tables = categorize_tables(input_tables)
     data_dict = get_data_dict_from_tables(tables)
-    return pl.DataFrame(data_dict)
+    date, invoice_number = get_date_and_invoice_number(html_path)
+    return pl.DataFrame(data_dict).with_columns([pl.lit(date).alias('date'), pl.lit(invoice_number).alias('invoice_number')])
