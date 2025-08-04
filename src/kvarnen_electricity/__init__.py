@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from kvarnen-electricity!")
+from .__about__ import __version__
