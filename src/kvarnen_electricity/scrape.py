@@ -21,6 +21,17 @@ class Scraper:
             logger.info(f"scrolling to bottom - {_scroll_count / _max_scrolls:.0%}")
 
     @staticmethod
+    def scroll_to_top(page):
+        _prev_height = -1
+        _max_scrolls = 20
+        _scroll_count = 0
+        while _scroll_count < _max_scrolls:
+            page.keyboard.down('Home')
+            page.wait_for_timeout(1000)
+            _scroll_count += 1
+            logger.info(f"scrolling to top - {_scroll_count / _max_scrolls:.0%}")
+
+    @staticmethod
     def pause(page, time_ms=1000):
         page.wait_for_timeout(time_ms)
 
@@ -41,12 +52,18 @@ class Scraper:
         self.pause(page)
         self.scroll_to_bottom(page)
         all_rows = page.get_by_text('Daniel Engvall', exact=True).all()
-        for idx, r in enumerate(all_rows):
+        self.scroll_to_top(page)
+        for idx, r in enumerate(all_rows[2:]):
             logger.info(f"clicking on row {idx} of {len(all_rows)}")
             r.click()
             self.pause(page)
-        all_pdf_buttons = page.get_by_text('Visa PDF-faktura', exact=True).all()
-        for idx, pdf_button in enumerate(all_pdf_buttons[1:]):
+            all_pdf_buttons = page.get_by_text('Visa PDF-faktura', exact=True).all()
+            logger.info(f'Currently {len(all_pdf_buttons)} expanded, clicking on idx {idx}')
+            try:
+                pdf_button = all_pdf_buttons[idx]
+            except IndexError:
+                logger.info(f'No more PDFs to download, exiting')
+                break
             with page.expect_download() as download_info:
                 pdf_button.scroll_into_view_if_needed()
                 pdf_button.click()
