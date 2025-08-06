@@ -14,6 +14,7 @@ cli_app = cyclopts.App(help='Application for accessing, parse and convert invoic
 
 DOWNLOAD_PATH = platformdirs.user_downloads_path()
 
+
 @cli_app.command()
 def download_invoices(download_path: Annotated[Path, Parameter(validator=validators.Path(exists=True), help='Path to download invoices to.')] = DOWNLOAD_PATH,
                       login_timout: Annotated[int, Parameter(help='Number of seconds to wait for 2FA to expire.')] = 20):
@@ -26,3 +27,7 @@ def download_invoices(download_path: Annotated[Path, Parameter(validator=validat
 
 def main():
     cli_app()
+
+
+if __name__ == '__main__':
+    main()
