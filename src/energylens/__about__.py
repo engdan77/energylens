@@ -1,2 +1,2 @@
-__version__ = "2025.8.1"
-__email__ = "daniel@engavlls.eu"
+__version__ = "2025.8.2"
+__email__ = "daniel@engvalls.eu"

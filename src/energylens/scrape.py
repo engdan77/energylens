@@ -98,10 +98,12 @@ class Scraper:
         self.pause(page, 10000)
         page.get_by_text('Daniel Engvall', exact=True).all()[1].click()
         self.pause(page)
+        page.get_by_text('Daniel Engvall', exact=True).all()[1].click()
+        self.pause(page)
         self.scroll_to_bottom(page)
         all_rows = page.get_by_text('Daniel Engvall', exact=True).all()
         self.scroll_to_top(page)
-        for idx, r in enumerate(all_rows[2:]):
+        for idx, r in enumerate(all_rows[1:]):
             logger.info(f"clicking on row {idx} of {len(all_rows)}")
             r.click()
             self.pause(page)
