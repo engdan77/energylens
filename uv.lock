@@ -301,7 +301,6 @@ wheels = [
 
 [[package]]
 name = "energylens"
-version = "2025.8.3"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },

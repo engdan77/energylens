@@ -6,7 +6,7 @@ from .scrape import Scraper
 def main():
     logger.info(f'Starting {__name__} {__version__}')
     scraper = Scraper()
-    scraper.download_all_invoices()
+    scraper.download_invoices()
     scraper.close()
 
 

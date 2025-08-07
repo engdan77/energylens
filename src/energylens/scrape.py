@@ -5,7 +5,7 @@ from .log import logger
 
 
 class Scraper:
-    def __init__(self, download_path: Path, login_secs: int = 20):
+    def __init__(self, download_path: Path, login_secs: int = 20, limit_invoices: int = 0):
         """
         Initializes the instance for managing browser interactions and executing operations
         in the application environment. It configures browser instances, sets required URLs,
@@ -16,6 +16,7 @@ class Scraper:
         :param login_secs: Timeout duration, in seconds, before 2FA expires.
         :type login_secs: int
         """
+        self.limit_invoices = limit_invoices
         self.login_secs = login_secs  # Timeout before 2FA expires
         self.playwright = sync_playwright().start()
         self.browser = self.playwright.firefox.launch(headless=False)
@@ -70,7 +71,7 @@ class Scraper:
     def pause(page, time_ms=1000):
         page.wait_for_timeout(time_ms)
 
-    def download_all_invoices(self) -> None:
+    def download_invoices(self) -> None:
         """
         Downloads all invoices from the user's account after logging in and navigating through the webpage.
         This function manages the login using BankID authentication, navigates to the invoice page, downloads
@@ -103,7 +104,12 @@ class Scraper:
         self.scroll_to_bottom(page)
         all_rows = page.get_by_text('Daniel Engvall', exact=True).all()
         self.scroll_to_top(page)
-        for idx, r in enumerate(all_rows[1:]):
+        if self.limit_invoices:
+            assert self.limit_invoices > 1, 'Limit must be greater than 1'
+            process_rows = all_rows[1:self.limit_invoices]
+        else:
+            process_rows = all_rows[1:]
+        for idx, r in enumerate(process_rows):
             logger.info(f"clicking on row {idx} of {len(all_rows)}")
             r.click()
             self.pause(page)

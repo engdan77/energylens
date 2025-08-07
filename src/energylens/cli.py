@@ -17,11 +17,12 @@ DOWNLOAD_PATH = platformdirs.user_downloads_path()
 
 @cli_app.command()
 def download_invoices(download_path: Annotated[Path, Parameter(validator=validators.Path(exists=True), help='Path to download invoices to.')] = DOWNLOAD_PATH,
-                      login_timout: Annotated[int, Parameter(help='Number of seconds to wait for 2FA to expire.')] = 20):
+                      login_timout: Annotated[int, Parameter(help='Number of seconds to wait for 2FA to expire.')] = 20,
+                      limit_invoices: Annotated[int, Parameter(help='Max months back to process')] = 0):
     """Downloads all invoices from the user's account."""
     logger.info(f'Starting {__name__} {__version__}')
-    scraper = Scraper(download_path=download_path, login_secs=login_timout)
-    scraper.download_all_invoices()
+    scraper = Scraper(download_path=download_path, login_secs=login_timout, limit_invoices=limit_invoices)
+    scraper.download_invoices()
     scraper.close()
 
 

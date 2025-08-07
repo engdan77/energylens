@@ -1,6 +1,6 @@
 [project]
 name = "energylens"
-version = "2025.8.3"
+dynamic = ["version"]
 description = "Process invoices for electricity from Jonkoping Energi"
 readme = "README.md"
 authors = [
@@ -29,3 +29,6 @@ build-backend = "hatchling.build"
 dev = [
     "wat>=0.6.0",
 ]
+
+[tool.hatch.version]
+path = "src/energylens/__about__.py"
