@@ -14,7 +14,7 @@ This project may be found valuable for others with this energy provider and/or f
 
 ## Usage
 
-Get help
+Ensure you have [UV package](https://docs.astral.sh/uv/guides/install-python/) manager <u>installed</u> and you can simply run e.g.
 
 ```shell
 $ uv run --with https://github.com/engdan77/energylens.git energylens --help                              
