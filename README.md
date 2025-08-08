@@ -14,5 +14,25 @@ This project may be found valuable for others with this energy provider and/or f
 
 ## Usage
 
-...
+Get help
+
+```shell
+$ uv run --with https://github.com/engdan77/energylens.git energylens --help                              
+
+Usage: energylens COMMAND
+
+Application for accessing, parse and convert invoices from Jonkoping Energi
+
+╭─ Commands ────────────────────────────────────────────────────────────────────────────╮
+│ download-invoices  Downloads invoices from a given source and saves them to a         │
+│                    specified path using a web scraper.                                │
+│ parse-invoices     Parses and processes invoices from PDF files into structured data, │
+│                    and outputs the parsed data to the specified location in the       │
+│                    desired format.                                                    │
+│ --help -h          Display this message and exit.                                     │
+│ --version          Display application version.                                       │
+╰───────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+
 
