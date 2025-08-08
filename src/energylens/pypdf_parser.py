@@ -30,9 +30,9 @@ def _texts_to_pl(text_pages: list[str]) -> pl.DataFrame:
     d['Elhandel fasta påslag (öre/kWh)'] = np.nan
     d['Elhandel fasta avgift (kr/mån)'] = re.findall(
         r'TOTALT BELOPP ELNÄT.+?ELHANDEL\n.+?kr/mån.+?Fast avgift.+?\d+,\d{2}(\d+,\d{2})', text, re.DOTALL)
-    d['Elhandel totalt belopp (kr)'] = re.findall(r'ELHANDEL (\d+,\d{2}) kr', text)
+    d['Elhandel totalt belopp (kr)'] = re.findall(r'ELHANDEL ([\d\s]+,\d{2}) kr', text)
     d['Fjärrvärme förbrukning (MWh)'] = re.findall(r'(\d+,\d{1,3}) MW', text)
-    d['Fjärrvärme fast avgift (kr/år)'] = re.findall(r'\d+ dgr kr/år krFast [Aa]vgift\s+.+\d+,\d{2}([\d\s]+,\d{2})', text, re.IGNORECASE)
+    d['Fjärrvärme fast avgift (kr/år)'] = re.findall(r'\d+ dgr kr/år krFast [Aa]vgift\s+.+\d+,\d{2}([\d\s]+,\d{2})\n', text, re.IGNORECASE)
     d['Fjärrvärme energiavgift (kr/MWh)'] = re.findall(r'kr/MWh krEnergiavgift\s+[\d+\s]+,\d{2}(\d+,\d{2})', text)
     d['Fjärrvärme totalt belopp (kr)'] = re.findall(r'FJÄRRVÄRME ([\d+\s]+,\d{2}) kr', text)
     d['Stadsnät serviceavgift villa (kr/st)'] = re.findall(r'Serviceavgift [Vv]illa.+?\d+,\d{2}(\d+,\d{2})', text)
