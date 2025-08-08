@@ -37,8 +37,8 @@ def _texts_to_pl(text_pages: list[str]) -> pl.DataFrame:
     d['Fjärrvärme energiavgift (kr/MWh)'] = re.findall(r'kr/MWh krEnergiavgift\s+\d+,\d{2}(\d+,\d{2})', text)
     d['Fjärrvärme totalt belopp (kr)'] = re.findall(r'FJÄRRVÄRME (\d+,\d{2}) kr', text)
     d['Stadsnät serviceavgift villa (kr/st)'] = re.findall(r'Serviceavgift villa.+?\d+,\d{2}(\d+,\d{2})', text)
-    date = re.findall(r'\d{4}-\d{2}-\d{2}', text)
-    invoice_number = re.findall(r'Faktura-nr: \d+', text)
+    date = d if (d := re.findall(r'\d{4}-\d{2}-\d{2}', text)) else np.nan
+    invoice_number = i if (i := re.findall(r'Faktura-nr: (\d+)', text)) else np.nan
     first_items = {k: _to_float(next(iter(v), np.nan)) if isinstance(v, list) else v for k, v in d.items()}
     return pl.DataFrame(first_items).with_columns([pl.lit(date).alias('date'), pl.lit(invoice_number).alias('invoice_number')])
 
