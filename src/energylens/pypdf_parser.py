@@ -20,7 +20,7 @@ def _pdf_to_text(pdf_file: Path) -> list[str]:
 def _texts_to_pl(text_pages: list[str]) -> pl.DataFrame:
     text = " ".join(text_pages)
     d = {}
-    d['Elnät fast avgift enkeltariff (kr/mån)'] = re.findall(r'^.+?Fast avgift enkeltariff.*?(\d+,\d{2})', text, re.DOTALL | re.IGNORECASE)
+    d['Elnät fast avgift enkeltariff (kr/mån)'] = re.findall(r'^.+?Fast [Aa]vgift(?: enkeltariff)?.*?(\d+,\d{2})', text, re.DOTALL)
     d['El förbrukning (kWh)'] = re.findall(r'(\d+(?:,\d{1,3})?) kWh\s', text, re.IGNORECASE)
     d['Elnät överföring enkeltariff (öre/kWh)'] = re.findall(r'Överföring(?: enkeltariff)?\s+\d+,\d{2}(\d+,\d{2})', text)
     d['Elnät energiskatt (öre/kWh)'] = re.findall(r'Energiskatt.+\d+,\d{2}(\d+,\d{2})', text)
