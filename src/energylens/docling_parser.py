@@ -9,6 +9,7 @@ import numpy as np
 from docling.document_converter import DocumentConverter
 
 from energylens.log import logger
+from energylens.number_utils import _to_float
 
 TableType = str
 TableTypeDict = dict[TableType, pd.DataFrame]
@@ -21,14 +22,6 @@ table_types = {
     ('Energiavgift', 'MWh'): 'fjärrvärme',
     ('Serviceavgift'): 'stadsnät'
 }
-
-
-def _to_float(s):
-    """Convenience method to convert string to float."""
-    if isinstance(s, str):
-        return float(np.char.replace(np.char.replace(s, ' ', ''), ',', '.'))
-    else:
-        return s
 
 
 def _categorize_tables(tables: list[pd.DataFrame]) -> TableTypeDict:
@@ -99,7 +92,7 @@ def convert_pdf_to_html(source: Path) -> str:
     return html
 
 
-def parse_html_to_pl(html_path: Path) -> pl.DataFrame:
+def parse_html_to_pl_using_docling(html_path: Path) -> pl.DataFrame:
     """Parse HTML file to Polars DataFrame."""
     input_tables = pd.read_html(html_path.as_posix(), decimal=',', thousands='.', header=0)
     tables = _categorize_tables(input_tables)

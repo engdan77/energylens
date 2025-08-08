@@ -2,13 +2,14 @@ import tempfile
 from pathlib import Path
 from typing import Annotated, Literal
 
+from energylens.pypdf_parser import parse_html_to_pl_using_pypdf
 from .log import logger
 import cyclopts
 from cyclopts import validators, Parameter
 from . import __version__
 
 from .scrape import Scraper
-from .parse import parse_html_to_pl, convert_pdf_to_html
+from .docling_parser import parse_html_to_pl_using_docling, convert_pdf_to_html
 import polars as pl
 import warnings
 
@@ -44,10 +45,11 @@ def parse_invoices(invoice_path: Annotated[Path, Parameter(validator=validators.
         with tempfile.NamedTemporaryFile() as tmp_file:
             tmp_file.write(html_content.encode())
             try:
-                invoice_df = parse_html_to_pl(Path(tmp_file.name))
+                invoice_df = parse_html_to_pl_using_docling(Path(tmp_file.name))
             except (KeyError, IndexError) as e:
-                logger.error(f'Error parsing invoice {f.as_posix()}: {e.__class__.__name__} {e}')
-                continue
+                # logger.error(f'Error parsing invoice {f.as_posix()}: {e.__class__.__name__} {e}')
+                logger.info('Attempt to parse again with different parser')
+                invoice_df = parse_html_to_pl_using_pypdf(f)
         output_df = output_df.vstack(invoice_df)
         logger.info(f'✅ Parsed {f.as_posix()}')
     match output_format:
