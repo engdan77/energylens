@@ -26,7 +26,24 @@ DOWNLOAD_PATH = platformdirs.user_downloads_path()
 def download_invoices(invoice_path: Annotated[Path, Parameter(validator=validators.Path(exists=True), help='Path to download invoices to.')] = DOWNLOAD_PATH,
                       login_timout: Annotated[int, Parameter(help='Number of seconds to wait for 2FA to expire.')] = 20,
                       limit_invoices: Annotated[int, Parameter(help='Max months back to process')] = 0):
-    """Downloads all invoices from the user's account."""
+    """
+    Downloads invoices from a given source and saves them to a specified path using a web scraper.
+
+    This function serves as a CLI command for downloading invoices. It utilizes a web scraper
+    to fetch invoices for the specified time period and saves them to the directory provided by
+    the user.
+
+    Args:
+        invoice_path (Path): Path to the directory where invoices will be downloaded. Must be a path that exists.
+        login_timout (int): Number of seconds to wait for two-factor authentication (2FA) to expire.
+        limit_invoices (int): Maximum number of months back for which invoices will be processed. Use 0 for no limit.
+
+    Raises:
+        None
+
+    Returns:
+        None
+    """
     logger.info(f'Starting {__name__} {__version__}')
     scraper = Scraper(download_path=invoice_path, login_secs=login_timout, limit_invoices=limit_invoices)
     scraper.download_invoices()
@@ -37,6 +54,26 @@ def download_invoices(invoice_path: Annotated[Path, Parameter(validator=validato
 def parse_invoices(invoice_path: Annotated[Path, Parameter(validator=validators.Path(exists=True), help='Path to download invoices to.')] = DOWNLOAD_PATH,
                    output_file: Annotated[Path, Parameter(help='Path to output parsed invoices to.')] = DOWNLOAD_PATH / 'invoices.parquet',
                    output_format: Annotated[Literal['parquet', 'csv'], Parameter(help='Output format.')] = 'parquet'):
+    """
+    Parses and processes invoices from PDF files into structured data, and outputs the parsed
+    data to the specified location in the desired format.
+
+    Args:
+        invoice_path (Annotated[Path, Parameter]): The path to the directory containing
+            invoice PDF files to parse. Must exist.
+        output_file (Annotated[Path, Parameter]): The path where the parsed invoices
+            will be saved. Defaults to "invoices.parquet" in the invoice path.
+        output_format (Annotated[Literal['parquet', 'csv'], Parameter]): The format
+            for the output file. Supported formats are "parquet" and "csv". Defaults
+            to "parquet".
+
+    Raises:
+        KeyError: If a parsing key is missing during invoice processing.
+        IndexError: If an index is invalid during invoice parsing.
+
+    Returns:
+        None
+    """
     logger.info(f'Starting {__name__} {__version__}')
     output_df = pl.DataFrame()
     for f in sorted(invoice_path.glob('invoice_*.pdf'), key=lambda x: x.name):
