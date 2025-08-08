@@ -32,14 +32,16 @@ def _texts_to_pl(text_pages: list[str]) -> pl.DataFrame:
     d['Elhandel fasta avgift (kr/mån)'] = re.findall(
         r'TOTALT BELOPP ELNÄT.+?ELHANDEL\n.+?kr/mån.+?Fast avgift.+?\d+,\d{2}(\d+,\d{2})', text, re.DOTALL)
     d['Elhandel totalt belopp (kr)'] = re.findall(r'ELHANDEL (\d+,\d{2}) kr', text)
-    d['Fjärrvärme förbrukning (MWh)'] = re.findall(r'(\d+,\d{2}) MW', text)
+    d['Fjärrvärme förbrukning (MWh)'] = re.findall(r'(\d+,\d{1,2}) MW', text)
     d['Fjärrvärme fast avgift (kr/år)'] = re.findall(r'\d+ dgr kr/år krFast Avgift\s+\d+,\d{2}([\d\s]+,\d{2})', text)
-    d['Fjärrvärme energiavgift (kr/MWh)'] = re.findall(r'kr/MWh krEnergiavgift\s+\d+,\d{2}(\d+,\d{2})', text)
-    d['Fjärrvärme totalt belopp (kr)'] = re.findall(r'FJÄRRVÄRME (\d+,\d{2}) kr', text)
+    d['Fjärrvärme energiavgift (kr/MWh)'] = re.findall(r'kr/MWh krEnergiavgift\s+[\d+\s]+,\d{2}(\d+,\d{2})', text)
+    d['Fjärrvärme totalt belopp (kr)'] = re.findall(r'FJÄRRVÄRME ([\d+\s]+,\d{2}) kr', text)
     d['Stadsnät serviceavgift villa (kr/st)'] = re.findall(r'Serviceavgift villa.+?\d+,\d{2}(\d+,\d{2})', text)
-    date = d if (d := re.findall(r'\d{4}-\d{2}-\d{2}', text)) else np.nan
-    invoice_number = i if (i := re.findall(r'Faktura-nr: (\d+)', text)) else np.nan
+    date = da[0] if (da := re.findall(r'\d{4}-\d{2}-\d{2}', text)) else np.nan
+    logger.info(f'Date: {date} using PyPDF')
+    invoice_number = i[0] if (i := re.findall(r'Faktura-nr: (\d+)', text)) else np.nan
     first_items = {k: _to_float(next(iter(v), np.nan)) if isinstance(v, list) else v for k, v in d.items()}
+    logger.info(f'{d['Fjärrvärme förbrukning (MWh)']=}')
     return pl.DataFrame(first_items).with_columns([pl.lit(date).alias('date'), pl.lit(invoice_number).alias('invoice_number')])
 
 

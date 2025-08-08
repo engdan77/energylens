@@ -98,4 +98,5 @@ def parse_html_to_pl_using_docling(html_path: Path) -> pl.DataFrame:
     tables = _categorize_tables(input_tables)
     data_dict = _get_data_dict_from_tables(tables)
     date, invoice_number = _get_date_and_invoice_number(html_path)
+    logger.info(f'Date: {date} using Docling')
     return pl.DataFrame(data_dict).with_columns([pl.lit(date).alias('date'), pl.lit(invoice_number).alias('invoice_number')])
