@@ -19,7 +19,8 @@ warnings.filterwarnings("ignore", module="torch")
 import platformdirs
 
 cli_app = cyclopts.App(
-    help="Application for accessing, parse and convert invoices from Jonkoping Energi"
+    help="Application for accessing, parse and convert invoices from Jonkoping Energi",
+    version=__version__
 )
 
 DOWNLOAD_PATH = platformdirs.user_downloads_path()
