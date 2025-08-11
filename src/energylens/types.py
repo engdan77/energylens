@@ -3,7 +3,7 @@ import dataclasses
 from cyclopts import Parameter
 
 
-@Parameter(name='*')
+@Parameter(name="*")
 @dataclasses.dataclass
 class Common:
-    filename_prefix: str = 'invoice_'
+    filename_prefix: str = "invoice_"

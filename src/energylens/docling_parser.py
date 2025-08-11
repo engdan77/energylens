@@ -17,10 +17,10 @@ TableTypeDict = dict[TableType, pd.DataFrame]
 
 # Keywords to determine what type of table within invoice
 table_types = {
-    ('Energiskatt', 'kWh', 'Överföring', 'Summa'): 'elnät',
-    ('Medelspotpris', 'påslag', 'kWh'): 'elhandel',
-    ('Energiavgift', 'MWh'): 'fjärrvärme',
-    ('Serviceavgift'): 'stadsnät'
+    ("Energiskatt", "kWh", "Överföring", "Summa"): "elnät",
+    ("Medelspotpris", "påslag", "kWh"): "elhandel",
+    ("Energiavgift", "MWh"): "fjärrvärme",
+    ("Serviceavgift"): "stadsnät",
 }
 
 
@@ -35,53 +35,74 @@ def _categorize_tables(tables: list[pd.DataFrame]) -> TableTypeDict:
     return output_tables
 
 
-def _get_first_row_beginning_with(df: pd.DataFrame, first_col_name: str, starts_with: str, return_col: str = 'Antal'):
+def _get_first_row_beginning_with(
+    df: pd.DataFrame, first_col_name: str, starts_with: str, return_col: str = "Antal"
+):
     try:
-        return _to_float(df[df[first_col_name].fillna('').str.startswith(starts_with)].iloc[0][return_col])
+        return _to_float(
+            df[df[first_col_name].fillna("").str.startswith(starts_with)].iloc[0][
+                return_col
+            ]
+        )
     except ValueError as e:
-        logger.warning(f'Could not find row starting with "{starts_with}" in table. Returning NaN.')
+        logger.warning(
+            f'Could not find row starting with "{starts_with}" in table. Returning NaN.'
+        )
         return np.nan
 
 
 def _get_data_dict_from_tables(tables: TableTypeDict) -> dict:
     """Extract data from tables and return as dictionary."""
-    col1 = 'Unnamed: 0'
+    col1 = "Unnamed: 0"
     d = {}
 
-    df = tables['elnät']
+    df = tables["elnät"]
     r = functools.partial(_get_first_row_beginning_with, df, col1)
-    d['El förbrukning (kWh)'] = r('Överföring', 'Antal')
-    d['Elnät fast avgift enkeltariff (kr/mån)'] = r('Fast avgift', 'Pris')
-    d['Elnät överföring enkeltariff (öre/kWh)'] = r('Överföring', 'Pris')
-    d['Elnät energiskatt (öre/kWh)'] = r('Energiskatt', 'Pris')
-    d['Elnät totalt belopp (kr)'] = r('TOTALT BELOPP', 'Summa')
+    d["El förbrukning (kWh)"] = r("Överföring", "Antal")
+    d["Elnät fast avgift enkeltariff (kr/mån)"] = r("Fast avgift", "Pris")
+    d["Elnät överföring enkeltariff (öre/kWh)"] = r("Överföring", "Pris")
+    d["Elnät energiskatt (öre/kWh)"] = r("Energiskatt", "Pris")
+    d["Elnät totalt belopp (kr)"] = r("TOTALT BELOPP", "Summa")
 
-    df = tables['elhandel']
+    df = tables["elhandel"]
     r = functools.partial(_get_first_row_beginning_with, df, col1)
-    d['Elhandel medelspotpris (öre/kWh)'] = r('Medelspotpris', 'Pris')
-    d['Elhandel rörliga kostnader (öre/kWh)'] = r('Rörliga kostnader', 'Pris')
-    d['Elhandel fasta påslag (öre/kWh)'] = r('Fasta påslag', 'Pris')
-    d['Elhandel fasta avgift (kr/mån)'] = r('Fast avgift', 'Pris')
-    d['Elhandel totalt belopp (kr)'] = r('TOTALT BELOPP', 'Summa')
+    d["Elhandel medelspotpris (öre/kWh)"] = r("Medelspotpris", "Pris")
+    d["Elhandel rörliga kostnader (öre/kWh)"] = r("Rörliga kostnader", "Pris")
+    d["Elhandel fasta påslag (öre/kWh)"] = r("Fasta påslag", "Pris")
+    d["Elhandel fasta avgift (kr/mån)"] = r("Fast avgift", "Pris")
+    d["Elhandel totalt belopp (kr)"] = r("TOTALT BELOPP", "Summa")
 
-    df = tables['fjärrvärme']
+    df = tables["fjärrvärme"]
     r = functools.partial(_get_first_row_beginning_with, df, col1)
-    d['Fjärrvärme förbrukning (MWh)'] = r('Energiavgift', 'Antal')
-    d['Fjärrvärme fast avgift (kr/år)'] = r('Fast Avgift','Pris')
-    d['Fjärrvärme energiavgift (kr/MWh)'] = r('Energiavgift', 'Pris')
-    d['Fjärrvärme totalt belopp (kr)'] = r('TOTALT BELOPP', 'Summa')
+    d["Fjärrvärme förbrukning (MWh)"] = r("Energiavgift", "Antal")
+    d["Fjärrvärme fast avgift (kr/år)"] = r("Fast Avgift", "Pris")
+    d["Fjärrvärme energiavgift (kr/MWh)"] = r("Energiavgift", "Pris")
+    d["Fjärrvärme totalt belopp (kr)"] = r("TOTALT BELOPP", "Summa")
 
-    df = tables['stadsnät']
+    df = tables["stadsnät"]
     r = functools.partial(_get_first_row_beginning_with, df, col1)
-    d['Stadsnät serviceavgift villa (kr/st)'] = r('Serviceavgift', 'Pris')
+    d["Stadsnät serviceavgift villa (kr/st)"] = r("Serviceavgift", "Pris")
     return d
 
 
 def _get_date_and_invoice_number(html_path: Path) -> tuple[str, str]:
     """Extract date and invoice number from HTML file name."""
     html = bs4.BeautifulSoup(open(html_path.as_posix()), features="lxml")
-    date = next((e.text.split().pop(0) for e in html.find_all('h2') if e.text.endswith('FAKTURA')))
-    invoice_number = next((list(html.find_all('p'))[idx + 1].text for idx, p in enumerate(list(html.find_all('p'))) if p.text.startswith('Faktura')), None)
+    date = next(
+        (
+            e.text.split().pop(0)
+            for e in html.find_all("h2")
+            if e.text.endswith("FAKTURA")
+        )
+    )
+    invoice_number = next(
+        (
+            list(html.find_all("p"))[idx + 1].text
+            for idx, p in enumerate(list(html.find_all("p")))
+            if p.text.startswith("Faktura")
+        ),
+        None,
+    )
     return date, invoice_number
 
 
@@ -94,9 +115,13 @@ def convert_pdf_to_html(source: Path) -> str:
 
 def parse_html_to_pl_using_docling(html_path: Path) -> pl.DataFrame:
     """Parse HTML file to Polars DataFrame."""
-    input_tables = pd.read_html(html_path.as_posix(), decimal=',', thousands='.', header=0)
+    input_tables = pd.read_html(
+        html_path.as_posix(), decimal=",", thousands=".", header=0
+    )
     tables = _categorize_tables(input_tables)
     data_dict = _get_data_dict_from_tables(tables)
     date, invoice_number = _get_date_and_invoice_number(html_path)
-    logger.info(f'Date: {date} using Docling')
-    return pl.DataFrame(data_dict).with_columns([pl.lit(date).alias('date'), pl.lit(invoice_number).alias('invoice_number')])
+    logger.info(f"Date: {date} using Docling")
+    return pl.DataFrame(data_dict).with_columns(
+        [pl.lit(date).alias("date"), pl.lit(invoice_number).alias("invoice_number")]
+    )
