@@ -24,12 +24,15 @@ def _texts_to_pl(text_pages: list[str]) -> pl.DataFrame:
     d['El förbrukning (kWh)'] = re.findall(r'(\d+(?:,\d{1,3})?) kWh\s', text, re.IGNORECASE)
     d['Elnät överföring enkeltariff (öre/kWh)'] = re.findall(r'Överföring(?: enkeltariff)?\s+\d+,\d{2}(\d+,\d{2})', text)
     d['Elnät energiskatt (öre/kWh)'] = re.findall(r'Energiskatt.+\d+,\d{2}(\d+,\d{2})', text)
-    d['Elnät totalt belopp (kr)'] = re.findall(r'TOTALT BELOPP ELNÄT.+?(\d+,\d{2}) kr\n', text)
+    d['Elnät totalt belopp (kr)'] = re.findall(r'TOTALT BELOPP ELNÄT.+?(\d+,\d{2})\skr[\s\n]', text)
     d['Elhandel medelspotpris (öre/kWh)'] = np.nan
     d['Elhandel rörliga kostnader (öre/kWh)'] = re.findall(r'(?:Rörligt månadspris|Elpris).+?\d+,\d{2}(\d+,\d{2})', text)
     d['Elhandel fasta påslag (öre/kWh)'] = np.nan
     d['Elhandel fasta avgift (kr/mån)'] = re.findall(
-        r'TOTALT BELOPP ELNÄT.+?ELHANDEL\n.+?kr/mån.+?Fast avgift.+?\d+,\d{2}(\d+,\d{2})', text, re.DOTALL)
+        r'TOTALT BELOPP ELNÄT.+?ELHANDEL\n.+?fast avgift.+?\d+,\d{2}(\d+,\d{2})', text, re.DOTALL)
+    if not d['Elhandel fasta avgift (kr/mån)']:
+        d['Elhandel fasta avgift (kr/mån)'] = re.findall(
+            r'TOTALT BELOPP ELNÄT.+?ELHANDEL\n.+?kr/mån.+?Fast avgift.+?\d+,\d{2}(\d+,\d{2})', text, re.DOTALL)
     d['Elhandel totalt belopp (kr)'] = re.findall(r'ELHANDEL ([\d\s]+,\d{2}) kr', text)
     d['Fjärrvärme förbrukning (MWh)'] = re.findall(r'(\d+,\d{1,3}) MW', text)
     d['Fjärrvärme fast avgift (kr/år)'] = re.findall(r'\d+ dgr kr/år krFast [Aa]vgift\s+.+\d+,\d{2}([\d\s]+,\d{2})\n', text, re.IGNORECASE)

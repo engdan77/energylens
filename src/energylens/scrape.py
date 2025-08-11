@@ -1,11 +1,13 @@
 from pathlib import Path
 
 from playwright.sync_api import Playwright, expect, sync_playwright
+
+from .types import Common
 from .log import logger
 
 
 class Scraper:
-    def __init__(self, download_path: Path, login_secs: int = 20, limit_invoices: int = 0):
+    def __init__(self, download_path: Path, login_secs: int = 20, limit_invoices: int = 0, *, common: Common | None = None):
         """
         Initializes the instance for managing browser interactions and executing operations
         in the application environment. It configures browser instances, sets required URLs,
@@ -23,6 +25,7 @@ class Scraper:
         self.context = self.browser.new_context()
         self.login_url = "https://idp.jonkopingenergi.se/Account/BankID?returnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Dweb-MinaSidor%26redirect_uri%3Dhttps%253A%252F%252Fminasidor.jonkopingenergi.se%252Fsignin-oidc%26response_type%3Dcode%26scope%3Dopenid%2520offline_access%26type%3Dprivate"
         self.my_account_url = "https://minasidor.jonkopingenergi.se/"
+        self.filename_prefix = common.filename_prefix if common else 'invoice_'
         self.download_path = download_path
         assert self.download_path.exists(), 'Download path does not exist'
 
@@ -124,7 +127,7 @@ class Scraper:
                 pdf_button.scroll_into_view_if_needed()
                 pdf_button.click()
             download = download_info.value
-            fn = self.download_path / f"invoice_{idx}.pdf"
+            fn = self.download_path / f"{self.filename_prefix}{idx}.pdf"
             download.save_as(fn.as_posix())
             self.pause(page)
         logger.info('Done')
