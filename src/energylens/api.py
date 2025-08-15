@@ -21,5 +21,5 @@ def get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
         return file_object
 
 
-def async_get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
+async def async_get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
     asyncio.to_thread(get_last_invoices, count, login_timeout)
