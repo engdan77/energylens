@@ -1,3 +1,4 @@
+import asyncio
 from io import BytesIO
 import tempfile
 from pathlib import Path
@@ -18,3 +19,7 @@ def get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
         parse_invoices(Path(tmpdirname), output_file=outputfilename, output_format="parquet")
         file_object.write(outputfilename.read_bytes())
         return file_object
+
+
+def async_get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
+    asyncio.to_thread(get_last_invoices, count, login_timeout)
