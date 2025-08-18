@@ -36,3 +36,7 @@ Application for accessing, parse and convert invoices from Jonkoping Energi
 
 
 
+## Do you have notebook using this?
+
+If you click [here](https://engdan77.github.io/notebooks/apps/energy.html) you'll get to a Notebook including chart and analysis that runs entirely within your browser thanks to WebAssembly, and that could easily be kept updated. 
+
