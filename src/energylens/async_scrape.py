@@ -6,6 +6,7 @@ from playwright.async_api import Playwright, expect, async_playwright
 from .error import async_exception_handler
 from .types import Common
 from .log import logger
+from .__about__ import __version__
 
 
 class AsyncScraper:
@@ -36,6 +37,7 @@ class AsyncScraper:
         asyncio.create_task(self.async_init(self.download_path, self.common))
 
     async def async_init(self, download_path: Path, common: Common | None = None):
+        logger.info(f"Initializing scraper {__version__}")
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.firefox.launch(headless=False)
         self.context = await self.browser.new_context()
@@ -44,6 +46,7 @@ class AsyncScraper:
         self.filename_prefix = common.filename_prefix if common else "invoice_"
         self.download_path = download_path
         self.ready_start = True
+        logger.info(f"Scraper initialized .. ready to scrape")
         assert self.download_path.exists(), "Download path does not exist"
 
     @staticmethod
@@ -78,6 +81,7 @@ class AsyncScraper:
             if self.ready_start and self.context is not None:
                 logger.info("Starting scraper")
                 break
+            logger.info("Scraper not ready yet, waiting 5 seconds")
             await asyncio.sleep(5)
         else:
             assert False, "Scraper not ready"
