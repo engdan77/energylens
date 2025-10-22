@@ -76,7 +76,7 @@ class AsyncScraper:
         await page.wait_for_timeout(time_ms)
 
     async def download_invoices(self) -> None:
-        for _ in range(3):
+        for _ in range(10):
             logger.info(f"Waiting for scraper to be ready - attempt {_ + 1}")
             if self.ready_start and self.context is not None:
                 logger.info("Starting scraper")
