@@ -37,19 +37,17 @@ class AsyncScraper:
     async def async_init(self):
         logger.info(f"Initializing scraper {__version__}")
         self.playwright = await async_playwright().start()
-        async with async_playwright() as p:
-            self.playwright = p
-            logger.info(f"Installing playwright")
-            install(p.firefox)
-            self.browser = await p.firefox.launch(headless=False)
-            self.context = await self.browser.new_context()
-            self.login_url = "https://idp.jonkopingenergi.se/Account/BankID?returnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Dweb-MinaSidor%26redirect_uri%3Dhttps%253A%252F%252Fminasidor.jonkopingenergi.se%252Fsignin-oidc%26response_type%3Dcode%26scope%3Dopenid%2520offline_access%26type%3Dprivate"
-            self.my_account_url = "https://minasidor.jonkopingenergi.se/"
-            self.filename_prefix = self.common.filename_prefix if self.common else "invoice_"
-            self.download_path = self.download_path
-            self.ready_start = True
-            logger.info(f"Scraper initialized .. ready to scrape")
-            assert self.download_path.exists(), "Download path does not exist"
+        logger.info(f"Installing playwright")
+        install(self.playwright.firefox)
+        self.browser = await self.playwright.firefox.launch(headless=False)
+        self.context = await self.browser.new_context()
+        self.login_url = "https://idp.jonkopingenergi.se/Account/BankID?returnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Dweb-MinaSidor%26redirect_uri%3Dhttps%253A%252F%252Fminasidor.jonkopingenergi.se%252Fsignin-oidc%26response_type%3Dcode%26scope%3Dopenid%2520offline_access%26type%3Dprivate"
+        self.my_account_url = "https://minasidor.jonkopingenergi.se/"
+        self.filename_prefix = self.common.filename_prefix if self.common else "invoice_"
+        self.download_path = self.download_path
+        self.ready_start = True
+        logger.info(f"Scraper initialized .. ready to scrape")
+        assert self.download_path.exists(), "Download path does not exist"
 
     @staticmethod
     async def scroll_to_bottom(page):
