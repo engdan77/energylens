@@ -17,6 +17,7 @@ class AsyncScraper:
         *,
         common: Common | None = None,
     ):
+        self.common = common
         self.download_path = None
         self.filename_prefix = None
         self.my_account_url = None
@@ -26,9 +27,13 @@ class AsyncScraper:
         self.playwright = None
         self.limit_invoices = limit_invoices
         self.login_secs = login_secs  # Timeout before 2FA expires
+        self.ready_start = False
         loop = asyncio.get_event_loop()
         loop.set_exception_handler(async_exception_handler)
         asyncio.create_task(self.async_init(download_path, common))
+
+    def start(self):
+        asyncio.create_task(self.async_init(self.download_path, self.common))
 
     async def async_init(self, download_path: Path, common: Common | None = None):
         self.playwright = await async_playwright().start()
@@ -38,6 +43,7 @@ class AsyncScraper:
         self.my_account_url = "https://minasidor.jonkopingenergi.se/"
         self.filename_prefix = common.filename_prefix if common else "invoice_"
         self.download_path = download_path
+        self.ready_start = True
         assert self.download_path.exists(), "Download path does not exist"
 
     @staticmethod
@@ -67,7 +73,13 @@ class AsyncScraper:
         await page.wait_for_timeout(time_ms)
 
     async def download_invoices(self) -> None:
-        await asyncio.sleep(3)
+        for _ in range(3):
+            logger.info(f"Waiting for scraper to be ready - attempt {_ + 1}")
+            if self.ready_start:
+                break
+            await asyncio.sleep(3)
+        else:
+            assert False, "Scraper not ready"
         page = await self.context.new_page()
         await page.goto(self.login_url)
         await expect(

@@ -46,4 +46,4 @@ def test_async_get_last_invoices():
 
 
 if __name__ == "__main__":
-    df = test_async_get_last_invoices()
+    test_async_get_last_invoices()
