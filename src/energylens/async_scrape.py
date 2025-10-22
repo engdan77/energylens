@@ -20,7 +20,7 @@ class AsyncScraper:
         common: Common | None = None,
     ):
         self.common = common
-        self.download_path = None
+        self.download_path = download_path
         self.filename_prefix = None
         self.my_account_url = None
         self.login_url = None
