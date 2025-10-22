@@ -75,9 +75,10 @@ class AsyncScraper:
     async def download_invoices(self) -> None:
         for _ in range(3):
             logger.info(f"Waiting for scraper to be ready - attempt {_ + 1}")
-            if self.ready_start:
+            if self.ready_start and self.context is not None:
+                logger.info("Starting scraper")
                 break
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
         else:
             assert False, "Scraper not ready"
         page = await self.context.new_page()
