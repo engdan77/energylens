@@ -31,20 +31,17 @@ class AsyncScraper:
         self.ready_start = False
         loop = asyncio.get_event_loop()
         loop.set_exception_handler(async_exception_handler)
-        asyncio.create_task(self.async_init(download_path, common))
+        logger.info('AsyncScraper created')
 
-    def start(self):
-        asyncio.create_task(self.async_init(self.download_path, self.common))
-
-    async def async_init(self, download_path: Path, common: Common | None = None):
+    async def async_init(self):
         logger.info(f"Initializing scraper {__version__}")
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.firefox.launch(headless=False)
         self.context = await self.browser.new_context()
         self.login_url = "https://idp.jonkopingenergi.se/Account/BankID?returnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Dweb-MinaSidor%26redirect_uri%3Dhttps%253A%252F%252Fminasidor.jonkopingenergi.se%252Fsignin-oidc%26response_type%3Dcode%26scope%3Dopenid%2520offline_access%26type%3Dprivate"
         self.my_account_url = "https://minasidor.jonkopingenergi.se/"
-        self.filename_prefix = common.filename_prefix if common else "invoice_"
-        self.download_path = download_path
+        self.filename_prefix = self.common.filename_prefix if self.common else "invoice_"
+        self.download_path = self.download_path
         self.ready_start = True
         logger.info(f"Scraper initialized .. ready to scrape")
         assert self.download_path.exists(), "Download path does not exist"

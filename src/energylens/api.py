@@ -33,6 +33,7 @@ async def async_get_last_invoices(count: int = 10, login_timeout: int = 30) -> P
             login_secs=login_timeout,
             limit_invoices=count
         )
+        await scraper.async_init()
         await scraper.download_invoices()
         await scraper.close()
         logger.info(f"Parsing invoices in {tmpdirname}")
