@@ -25,6 +25,7 @@ def get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
 async def async_get_last_invoices(count: int = 10, login_timeout: int = 30) -> Parquet:
     file_object = BytesIO()
     with tempfile.TemporaryDirectory() as tmpdirname:
+        logger.info(f"Starting async download of invoices storing to {tmpdirname} ")
         outputfilename = Path(f"{tmpdirname}/tmp.parquet")
         logger.info(f"Downloading invoices to {tmpdirname}")
         scraper = AsyncScraper(
@@ -41,9 +42,8 @@ async def async_get_last_invoices(count: int = 10, login_timeout: int = 30) -> P
 
 
 def test_async_get_last_invoices():
-    asyncio.run(async_get_last_invoices(3))
+    return asyncio.run(async_get_last_invoices(3))
 
 
 if __name__ == "__main__":
     df = test_async_get_last_invoices()
-    logger.info(f'{len(df)=}')

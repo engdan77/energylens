@@ -3,6 +3,7 @@ from pathlib import Path
 
 from playwright.async_api import Playwright, expect, async_playwright
 
+from .error import async_exception_handler
 from .types import Common
 from .log import logger
 
@@ -25,6 +26,8 @@ class AsyncScraper:
         self.playwright = None
         self.limit_invoices = limit_invoices
         self.login_secs = login_secs  # Timeout before 2FA expires
+        loop = asyncio.get_event_loop()
+        loop.set_exception_handler(async_exception_handler)
         asyncio.create_task(self.async_init(download_path, common))
 
     async def async_init(self, download_path: Path, common: Common | None = None):
